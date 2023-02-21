@@ -1,27 +1,35 @@
-# CS361
-CS 361 Software Engineering 1 project. Mortgage rate calculator desktop app.
+CS_361
 
-For current interest rate microservice make requests via using ZMQ for communication.
-Example program including calling and receiving using python:
+Work for Software Engineering I [CS361]
+
+Spray Cave Climbing App
+
+An app to upload and view custom rock climbs for the Dixon cave climbing wall.
+
+Climb Data Microservice
+
+A microservice to store and send data for custom climbs. Uses zeromq to communicate over a network.
+
+Connect to server
 
 import zmq
 
-context = zmq.Context()
+context = zmq.Context() socket = context.socket(zmq.REQ) socket.connect("tcp://localhost:5555")
 
-#  Socket to talk to server
-print("Connecting to get rate server")
-socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:5555")
+Sending requests
 
-credit_score = 650
+Requests are made using json objects. The first key of this object is "method", which can be either "add" or "get.
 
-#  Do a request and wait for a response
-socket.send_string(f"{credit_score}")
+Add method
 
-#  Get the reply
-message = socket.recv_string()
+The add method requires one more key, which is "data". The value of this key needs to be a json object containing data for a climb. The microservice will respond with a json object containing the status of the request, which will either be "success", or "fail" if the data couldn't be stored.
 
-# Close and unbind socket once done
-socket.unbind("tcp://*:5555")
-socket.close()
-context.term()
+Example usage: socket.send_json({"method": "add", "data": climb}) response = socket.recv_json()
+
+where climb is an object containing json data
+
+Get method
+
+The get method requests all of the data stored by the microservice. The microservice will respond with the json object containing this data (stored objects in an array called "climbData")
+
+Example usage: socket.send_json({"method": "get"}) response = socket.recv_json()
